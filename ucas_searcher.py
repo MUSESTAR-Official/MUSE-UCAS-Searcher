@@ -5,8 +5,61 @@ import requests
 import json
 import re
 import time
+import os
+import sys
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
+
+def get_version():
+    try:
+        if hasattr(sys, '_MEIPASS'):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(os.path.abspath(__file__))
+        
+        version_file = os.path.join(base_path, "version_info.txt")
+        
+        if os.path.exists(version_file):
+            with open(version_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+                match = re.search(r"StringStruct\(u'ProductVersion',\s*u'([^']+)'\)", content)
+                if match:
+                    return match.group(1)
+        
+        return "0.0.0"
+    except Exception:
+        return "未知版本"
+
+def show_muse_banner():
+    banner = r"""
+          _____                    _____                    _____                    _____          
+         /\    \                  /\    \                  /\    \                  /\    \         
+        /::\____\                /::\____\                /::\    \                /::\    \        
+       /::::|   |               /:::/    /               /::::\    \              /::::\    \       
+      /:::::|   |              /:::/    /               /::::::\    \            /::::::\    \      
+     /::::::|   |             /:::/    /               /:::/\:::\    \          /:::/\:::\    \     
+    /:::/|::|   |            /:::/    /               /:::/__\:::\    \        /:::/__\:::\    \    
+   /:::/ |::|   |           /:::/    /                \:::\   \:::\    \      /::::\   \:::\    \   
+  /:::/  |::|___|______    /:::/    /      _____    ___\:::\   \:::\    \    /::::::\   \:::\    \  
+ /:::/   |::::::::\    \  /:::/____/      /\    \  /\   \:::\   \:::\    \  /:::/\:::\   \:::\    \ 
+/:::/    |:::::::::\____\|:::|    /      /::\____\/::\   \:::\   \:::\____\/:::/__\:::\   \:::\____\
+\::/    / ~~~~~/:::/    /|:::|____\     /:::/    /\:::\   \:::\   \::/    /\:::\   \:::\   \::/    /
+ \/____/      /:::/    /  \:::\    \   /:::/    /  \:::\   \:::\   \/____/  \:::\   \:::\   \/____/ 
+             /:::/    /    \:::\    \ /:::/    /    \:::\   \:::\    \       \:::\   \:::\    \     
+            /:::/    /      \:::\    /:::/    /      \:::\   \:::\____\       \:::\   \:::\____\    
+           /:::/    /        \:::\__/:::/    /        \:::\  /:::/    /        \:::\   \::/    /    
+          /:::/    /          \::::::::/    /          \:::\/:::/    /          \:::\   \/____/     
+         /:::/    /            \::::::/    /            \::::::/    /            \:::\    \         
+        /:::/    /              \::::/    /              \::::/    /              \:::\____\        
+        \::/    /                \::/____/                \::/    /                \::/    /        
+         \/____/                  ~~                       \/____/                  \/____/         
+    """
+    print(banner)
+    print()
+    version = get_version()
+    print(f"MUSE-UCAS-Searcher v{version}")
+    print("=" * 88)
+    print()
 
 @dataclass
 class CourseInfo:
@@ -219,6 +272,7 @@ class UCASSearcher:
         print(f"已保存{len(courses_data)}个课程到 {filename}")
 
 def main():
+    show_muse_banner()
     searcher = UCASSearcher()
     
     keyword = input("请输入搜索关键词: ").strip()
@@ -277,5 +331,28 @@ def main():
     
     print("\n搜索完成！")
 
+def run_main():
+    while True:
+        try:
+            main()
+        except KeyboardInterrupt:
+            print("\n程序已被用户中断")
+        except Exception as e:
+            import traceback
+            print(f"程序运行出错: {e}")
+            print("\n完整错误详情:")
+            print(traceback.format_exc())
+        
+        while True:
+            choice = input("\n退出(T)/重新开始(S): ").strip().upper()
+            if choice == 'T':
+                print("程序已退出")
+                return
+            elif choice == 'S':
+                print("\n重新开始程序...\n")
+                break
+            else:
+                print("请输入 T 或 S")
+
 if __name__ == "__main__":
-    main()
+    run_main()

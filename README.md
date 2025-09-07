@@ -22,6 +22,7 @@ pip install -r requirements.txt
 ```bash
 python ucas_searcher.py
 ```
+（或直接下载Releases中打包好的exe文件）
 
 2. 输入搜索关键词（如："Artificial Intelligence", "Computer Science", "Medicine"等）
 
